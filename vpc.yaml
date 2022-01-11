@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "This template creates vpc and private subnet and public subnet"
+
+Parameters:
+  vpcCIRD:
+    Default: 10.0.0.0/16
+    Description: "Please enter the IP(CIDR) for the VPC"
+    Type: String
+
+  PublicSubnet1CIRD:
+    Default: 10.0.0.0/24
+    Description: "Please enter the IP(CIDR) for the public subnet 1"
+    Type: String
+
+
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref vpcCIRD
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: Test Vpc
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Test IGW
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref myVPC
+    
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0,!GetAZs '']
+      CidrBlock: !Ref PublicSubnet1CIRD
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key: Name
+          Value: Public Subnet 1
+      VpcId: !Ref myVPC
+
